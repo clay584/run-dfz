@@ -15,20 +15,17 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
 
 # Installation
 
-1. Provision a CSR1000v in your lab emulation software with a fair amount of memory (I tested with 16GB, but you may be able to get away with less). I was only able to get the guestshell to run with a maximum of 4GB with the `app-hosting` configuration, so that may be the limiting factor even if the CSR1000v can have more memory. That said, inside of guestshell, it does show 16GB of memory available, but I have a feeling the LXC container management will enforce 4 GB limit. I think this is the case because when trying to do some compilation and other things, the CSR1000v kernel was logging to console that it was rate-limiting the container.
+1. Provision a CSR1000v in your lab emulation software with a fair amount of memory (I tested with 16GB, but you may be able to get away with less). I was only able to get the guestshell to run with a maximum of 4GB with the `app-hosting` configuration, so that may be the limiting factor even if the CSR1000v can have more memory. That said, inside of guestshell, it does show 16GB of memory available, but I have a feeling the LXC container management will enforce 4 GB limit. I think this is the case because when trying to do some compilation and other things, the CSR1000v kernel was logging to console that it was rate-limiting the container. Below is the memory utilization when running with 174k prefixes. Not too bad!
+    ```
+    Router#show platform software status control-processor brief
+    Load Average
+    Slot  Status  1-Min  5-Min 15-Min
+    RP0 Healthy   3.00   2.92   2.95\
 
-Below is the memory utilization when running with 174k prefixes. Not too bad!
-
-```
-Router#show platform software status control-processor brief
-Load Average
-Slot  Status  1-Min  5-Min 15-Min
-RP0 Healthy   3.00   2.92   2.95\
-
-Memory (kB)
-Slot  Status    Total     Used (Pct)     Free (Pct) Committed (Pct)
-RP0 Healthy 16370252  3485160 (21%) 12885092 (79%)   4656900 (28%)
-```
+    Memory (kB)
+    Slot  Status    Total     Used (Pct)     Free (Pct) Committed (Pct)
+    RP0 Healthy 16370252  3485160 (21%) 12885092 (79%)   4656900 (28%)
+    ```
 
 2. Connect the router to the outside world via a cloud/NAT/bridged connection. You will need to pull the necessary files onto the router.
 
