@@ -19,16 +19,16 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
 
 Below is the memory utilization when running with 174k prefixes. Not too bad!
 
-    ```
-    Router#show platform software status control-processor brief
-    Load Average
-    Slot  Status  1-Min  5-Min 15-Min
-    RP0 Healthy   3.00   2.92   2.95\
+```
+Router#show platform software status control-processor brief
+Load Average
+Slot  Status  1-Min  5-Min 15-Min
+RP0 Healthy   3.00   2.92   2.95\
 
-    Memory (kB)
-    Slot  Status    Total     Used (Pct)     Free (Pct) Committed (Pct)
-    RP0 Healthy 16370252  3485160 (21%) 12885092 (79%)   4656900 (28%)
-    ```
+Memory (kB)
+Slot  Status    Total     Used (Pct)     Free (Pct) Committed (Pct)
+RP0 Healthy 16370252  3485160 (21%) 12885092 (79%)   4656900 (28%)
+```
 
 2. Connect the router to the outside world via a cloud/NAT/bridged connection. You will need to pull the necessary files onto the router.
 
