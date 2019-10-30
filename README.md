@@ -130,3 +130,23 @@ Inside of the routes.tar.gz file, there are four files. You can use any of these
 * `routes-short.txt` - Partial tables (~175k prefixes) from one peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
 * `routes2.txt` - Full tables (~800k prefixes) from a second peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
 * `routes2-short.txt` - Partial tables (~175k prefixes) from a second peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
+
+# Misc Info
+
+In order to create the route files, the data was downloaded from the [RIPE NCC RIS Raw Data](https://www.ripe.net/analyse/internet-measurements/routing-information-service-ris/ris-raw-data) page.
+
+The bgpdump program was downloaded from [here](http://ris.ripe.net/source/bgpdump/) and compiled.
+
+Then this command was used to get the different peers from that RIS data.
+
+`zcat latest-bview.gz | bgpdump -m - | head -50000 | cut -d '|' -f 4 | grep -v ':' | sort | uniq`
+
+Then select one of the peers and use this command to get the data for just one peer.
+
+`zcat latest-bview.gz | bgpdump -m - | grep '198.32.124.254' > routes.txt`
+
+Then if you want to truncate it for partial tables, you just chop the file with sed.
+
+`sed -e "200000q" routes.txt > routes-short.txt`
+
+As for bgpsimple, I had quite a hard time getting this to compile and run on the guestshell container, so once I did, I used Par::Packer to compile the perl script to an actual executable. This made it so people (future me) didn't have to get a working perl environment, compile, and install bgpsimple or it's perl dependencies in the guestshell container.
