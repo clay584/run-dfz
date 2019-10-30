@@ -1,5 +1,6 @@
 # run-dfz
 
+![Run DFZ](run-dfz.png)
 One of the things I have wanted to test over the years was having realistic Internet BGP data inside of a lab network. Traditionally this would entail peering with a real router in production. I have never been in an environment that would be OK with this, so I always just simulated the Internet with a couple of prefixes. This fixes that problem and allows you to run a router and get hundreds of thousands of BGP prefixes into your lab environment.
 
 
