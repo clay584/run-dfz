@@ -91,7 +91,11 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
 
 9. Run bgpsimple and point to a routes file.
 
-    `sudo ./bgp_simple -myas 64999 -myip 192.168.100.2 -peerip 192.168.100.1 -peeras 65000 -p routes-short.txt -holdtime 300 -keepalive 30`
+    `sudo ./bgp_simple -myas 64999 -myip 192.168.100.2 -peerip 192.168.100.1 -peeras 65000 -p routes-short.txt -holdtime 300 -keepalive 30 -o /dev/null > /dev/null 2>&1`
+
+    You can also use the `-m` flag to limit the number of prefixes from the file to advertise. For example, the below command would only inject 100 prefixes.
+
+    `sudo ./bgp_simple -myas 64999 -myip 192.168.100.2 -peerip 192.168.100.1 -peeras 65000 -p routes-short.txt -holdtime 300 -keepalive 30 -m 100 -o /dev/null > /dev/null 2>&1`
 
 10. Exit the guestshell
 
