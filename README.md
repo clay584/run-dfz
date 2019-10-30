@@ -103,21 +103,21 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
 12. The BGP peering should come up and you should get a lot of routes in the RIB.
 
     ```
-    Router#sh ip bgp summary
+    Router#sh ip bgp sum
     BGP router identifier 192.168.100.1, local AS number 65000
-    BGP table version is 1, main routing table version 1
-    2630 network entries using 652240 bytes of memory
-    2630 path entries using 357680 bytes of memory
-    232/0 BGP path/bestpath attribute entries using 64960 bytes of memory
-    205 BGP AS-PATH entries using 9830 bytes of memory
-    6 BGP community entries using 144 bytes of memory
+    BGP table version is 174268, main routing table version 174268
+    174267 network entries using 43218216 bytes of memory
+    174267 path entries using 23700312 bytes of memory
+    26419/26419 BGP path/bestpath attribute entries using 7397320 bytes of memory
+    22041 BGP AS-PATH entries using 1108960 bytes of memory
+    20 BGP community entries using 480 bytes of memory
     0 BGP route-map cache entries using 0 bytes of memory
     0 BGP filter-list cache entries using 0 bytes of memory
-    BGP using 1084854 total bytes of memory
-    BGP activity 2630/0 prefixes, 2630/0 paths, scan interval 60 secs
+    BGP using 75425288 total bytes of memory
+    BGP activity 174267/0 prefixes, 174267/0 paths, scan interval 60 secs
 
     Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-    192.168.100.2   4        64999    2632       2        1    0    0 00:00:08     2630
+    192.168.100.2   4        64999  174374      62   174268    0    0 00:53:55   174267
     ```
 
 13. Once you have this working, it is ok to disconnect the router from the real network. It is no longer needed after installation.
