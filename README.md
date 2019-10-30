@@ -161,3 +161,9 @@ Then if you want to truncate it for partial tables, you just chop the file with 
 `sed -e "200000q" routes.txt > routes-short.txt`
 
 As for bgpsimple, I had quite a hard time getting this to compile and run on the guestshell container, so once I did, I used Par::Packer to compile the perl script to an actual executable. This made it so people (future me) didn't have to get a working perl environment, compile, and install bgpsimple or it's perl dependencies in the guestshell container.
+
+# Attribution
+
+Thanks to this article for helping with some of the bits I was unfamiliar with.
+
+[http://networkingbodges.blogspot.com/2019/04/a-real-full-internet-table-in-lab.html](http://networkingbodges.blogspot.com/2019/04/a-real-full-internet-table-in-lab.html)
