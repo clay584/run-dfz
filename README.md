@@ -35,16 +35,16 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
     ```
     conf t
     interface VirtualPortGroup0
-    description *** SVI facing guestshell container ***
-    ip nat inside
-    ip address 192.168.100.1 255.255.255.0
-    no shut
+     description *** SVI facing guestshell container ***
+     ip nat inside
+     ip address 192.168.100.1 255.255.255.0
+     no shut
     !
     interface GigabitEthernet1
-    description *** Outside Network Connectivity ***
-    ip nat outside
-    ip address 192.168.4.96 255.255.255.0
-    no shut
+     description *** Outside Network Connectivity ***
+     ip nat outside
+     ip address 192.168.4.96 255.255.255.0
+     no shut
     !
     ip route 0.0.0.0 0.0.0.0 192.168.4.1
     !
@@ -53,14 +53,9 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
     ip nat inside source list 1 interface GigabitEthernet1 overload
     !
     app-hosting appid guestshell
-    resource profile custom cpu 20000 memory 4096
+     resource profile custom cpu 20000 memory 4096
     !
     iox
-    !
-    app-hosting appid guestshell
-    resource profile custom
-    resource profile custom cpu 20000
-    resource profile custom cpu 20000 memory 4096
     !
     end
     !
