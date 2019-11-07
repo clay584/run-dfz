@@ -102,15 +102,17 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
 
     `sudo -E ./gobgpd -f gobgpd.conf`
 
-14. Exit the guestshell
+14. Exit tmux.
 
     `ctrl + b` then press `d` to disconnect from the tmux session.
 
 15. Inject the routes with the gobgp client cli tool where the last parameter (100000) is the number of prefixes to inject. You can go as high as you want, but if you run this inside of guestshell, the resources are so constrained that it is likely it will crash gobgp. 100k routes is a good number. If you want all 800k, then it is much more stable to run this gobgp part from a regular linux server that has engough CPU and memory to do the whole table.
 
-    `gobgp mrt --no-ipv6 --nexthop 192.168.100.2 inject global latest-bview 100000`
+    `sudo gobgp mrt --no-ipv6 --nexthop 192.168.100.2 inject global latest-bview 100000`
 
-16. Configure BGP on the router.
+16. Exit guestshell
+
+17. Configure BGP on the router.
     ```
     conf t
     router bgp 65000
@@ -124,7 +126,7 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
     !
     end
     ```
-17. The BGP peering should come up and you should get a lot of routes in the RIB.
+18. The BGP peering should come up and you should get a lot of routes in the RIB.
 
     ```
     Router#sh ip bgp sum
@@ -146,4 +148,4 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
     192.168.4.72    4        64999 6345738      41  6345703    0    0 00:17:08   807176
     ```
 
-18. Once you have this working, it is ok to disconnect the router from the real network. It is no longer needed after installation.
+19. Once you have this working, it is ok to disconnect the router from the real network. It is no longer needed after installation.
