@@ -72,31 +72,45 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
 
     `sudo yum update -y nss curl libcurl`
 
-6. Clone this git repo inside of your guestshell and enter the directory.
+6. Install Go using [these instructions](https://linuxize.com/post/how-to-install-go-on-centos-7/).
+
+7. Change directory into the /bootflash directory and download GoBGP.
+
+    `cd /bootflash && wget https://github.com/osrg/gobgp/releases/download/v2.10.0/gobgp_2.10.0_linux_amd64.tar.gz`
+
+8. Extract the tar.gz file.
+
+    `sudo tar zxvf gobgp_2.10.0_linux_amd64.tar.gz --wildcards -C /usr/sbin 'gobgp*'`
+
+9. Clone this git repo inside of your guestshell and enter the directory.
 
     `git clone https://github.com/clay584/run-dfz.git /bootflash/run-dfz && cd /bootflash/run-dfz`
 
-7. Extract the routes files to the router's bootflash (bootflash has plenty of space available).
+10. Download any of the route data files from RIPE.
 
-    `tar zxvf routes.tar.gz`
+    `https://www.ripe.net/analyse/internet-measurements/routing-information-service-ris/ris-raw-data`
 
-8. Enter a tmux shell.
+11. Extract the routing data.
+
+    `gunzip -d latest-bviews.gz`
+
+12. Enter a tmux shell.
 
     `tmux`
 
-9. Run bgpsimple and point to a routes file.
+13. Run gobgpd and point to `gobgpd.conf`.
 
-    `sudo ./bgp_simple -myas 64999 -myip 192.168.100.2 -peerip 192.168.100.1 -peeras 65000 -p routes-short.txt -holdtime 300 -keepalive 30 -o /dev/null > /dev/null 2>&1`
+    `sudo -E ./gobgpd -f gobgpd.conf`
 
-    You can also use the `-m` flag to limit the number of prefixes from the file to advertise. For example, the below command would only inject 100 prefixes.
+14. Exit the guestshell
 
-    `sudo ./bgp_simple -myas 64999 -myip 192.168.100.2 -peerip 192.168.100.1 -peeras 65000 -p routes-short.txt -holdtime 300 -keepalive 30 -m 100 -o /dev/null > /dev/null 2>&1`
+    `ctrl + b` then press `d` to disconnect from the tmux session.
 
-10. Exit the guestshell
+15. Inject the routes with the gobgp client cli tool where the last parameter (100000) is the number of prefixes to inject. You can go as high as you want, but if you run this inside of guestshell, the resources are so constrained that it is likely it will crash gobgp. 100k routes is a good number. If you want all 800k, then it is much more stable to run this gobgp part from a regular linux server that has engough CPU and memory to do the whole table.
 
-    `ctrl + b` then press `d` to disconnect from the tmux session. Then type `exit` to leave guestshell and go back to the router prompt.
+    `gobgp mrt --no-ipv6 --nexthop 192.168.100.2 inject global latest-bview 100000`
 
-11. Configure BGP on the router.
+16. Configure BGP on the router.
     ```
     conf t
     router bgp 65000
@@ -110,59 +124,26 @@ This works by running a guestshell instance on a CSR1000v router and then peerin
     !
     end
     ```
-12. The BGP peering should come up and you should get a lot of routes in the RIB.
+17. The BGP peering should come up and you should get a lot of routes in the RIB.
 
     ```
     Router#sh ip bgp sum
-    BGP router identifier 192.168.100.1, local AS number 65000
-    BGP table version is 174268, main routing table version 174268
-    174267 network entries using 43218216 bytes of memory
-    174267 path entries using 23700312 bytes of memory
-    26419/26419 BGP path/bestpath attribute entries using 7397320 bytes of memory
-    22041 BGP AS-PATH entries using 1108960 bytes of memory
-    20 BGP community entries using 480 bytes of memory
+    BGP router identifier 192.168.4.97, local AS number 65000
+    BGP table version is 6345703, main routing table version 6345703
+    807176 network entries using 200179648 bytes of memory
+    807176 path entries using 109775936 bytes of memory
+    120947/120947 BGP path/bestpath attribute entries using 33865160 bytes of memory
+    106349 BGP AS-PATH entries using 5628320 bytes of memory
+    1 BGP ATTR_SET entries using 40 bytes of memory
+    292 BGP community entries using 17064 bytes of memory
+    13 BGP extended community entries using 432 bytes of memory
     0 BGP route-map cache entries using 0 bytes of memory
     0 BGP filter-list cache entries using 0 bytes of memory
-    BGP using 75425288 total bytes of memory
-    BGP activity 174267/0 prefixes, 174267/0 paths, scan interval 60 secs
+    BGP using 349466560 total bytes of memory
+    BGP activity 807176/0 prefixes, 807176/0 paths, scan interval 60 secs
 
     Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-    192.168.100.2   4        64999  174374      62   174268    0    0 00:53:55   174267
+    192.168.4.72    4        64999 6345738      41  6345703    0    0 00:17:08   807176
     ```
 
-13. Once you have this working, it is ok to disconnect the router from the real network. It is no longer needed after installation.
-
-# Route Files
-
-Inside of the routes.tar.gz file, there are four files. You can use any of these you want. I found that 800k prefixes tends to crash the CSR1000v routers in my lab, so that's why I created the partial files.
-
-* `routes.txt` - Full tables (~800k prefixes) from one peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
-* `routes-short.txt` - Partial tables (~175k prefixes) from one peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
-* `routes2.txt` - Full tables (~800k prefixes) from a second peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
-* `routes2-short.txt` - Partial tables (~175k prefixes) from a second peer at the Equinix Miami MI1 data center (RIPE RIS Data from 10/28/2019).
-
-# Misc Info
-
-In order to create the route files, the data was downloaded from the [RIPE NCC RIS Raw Data](https://www.ripe.net/analyse/internet-measurements/routing-information-service-ris/ris-raw-data) page.
-
-The bgpdump program was downloaded from [here](http://ris.ripe.net/source/bgpdump/) and compiled.
-
-Then this command was used to get the different peers from that RIS data.
-
-`zcat latest-bview.gz | bgpdump -m - | head -50000 | cut -d '|' -f 4 | grep -v ':' | sort | uniq`
-
-Then select one of the peers and use this command to get the data for just one peer.
-
-`zcat latest-bview.gz | bgpdump -m - | grep '198.32.124.254' > routes.txt`
-
-Then if you want to truncate it for partial tables, you just chop the file with sed.
-
-`sed -e "200000q" routes.txt > routes-short.txt`
-
-As for bgpsimple, I had quite a hard time getting this to compile and run on the guestshell container, so once I did, I used Par::Packer to compile the perl script to an actual executable. This made it so people (future me) didn't have to get a working perl environment, compile, and install bgpsimple or it's perl dependencies in the guestshell container.
-
-# Attribution
-
-Thanks to this article for helping with some of the bits I was unfamiliar with.
-
-[http://networkingbodges.blogspot.com/2019/04/a-real-full-internet-table-in-lab.html](http://networkingbodges.blogspot.com/2019/04/a-real-full-internet-table-in-lab.html)
+18. Once you have this working, it is ok to disconnect the router from the real network. It is no longer needed after installation.
